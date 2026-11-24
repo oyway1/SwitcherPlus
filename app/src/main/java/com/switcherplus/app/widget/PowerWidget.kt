@@ -24,7 +24,7 @@ class PowerWidget : AppWidgetProvider() {
         Switchers.init(context)
         appWidgetIds.forEach { render(context, manager, it) }
         // Periodic refresh: fetch the real state of every device shown on a widget.
-        val ids = appWidgetIds.mapNotNull { Switchers.device(deviceFor(context, it))?.config?.id }.distinct()
+        val ids = appWidgetIds.toList().mapNotNull { widgetId: Int -> Switchers.device(deviceFor(context, widgetId))?.config?.id }.distinct()
         if (ids.isEmpty()) return
         val pending = goAsync()
         CoroutineScope(Dispatchers.IO).launch {
