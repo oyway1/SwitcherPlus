@@ -276,6 +276,47 @@ object Switchers {
         savePrefs(); publish()
     }
 
+    // ---------------- widget support ----------------
+
+    fun device(id: String?): Device? {
+        val list = _devices.value
+        return list.firstOrNull { it.config.id == id } ?: list.firstOrNull()
+    }
+
+    /** Refresh one device's state now (used by the widget when the engine isn't running). */
+    suspend fun refresh(id: String) = pollAndGuard(id)
+
+    /** Toggle based on the device's real current state. Turning on respects the auto-off limit. */
+    suspend fun toggleNow(id: String) {
+        val cfg = configs.value[id] ?: return
+        updateStatus(id) { it.copy(busy = true, error = null) }
+        try {
+            lock(id).withLock {
+                val st = client(cfg).getState()
+                if (st.on) {
+                    client(cfg).turnOff()
+                    addLog("${cfg.name}: כובה מהווידג'ט")
+                    updateStatus(id) { it.copy(on = false, powerWatts = 0, timeLeftSec = 0, timeOnSec = 0) }
+                } else {
+                    val minutes = if (cfg.guardEnabled) cfg.limitMinutes else 0
+                    client(cfg).turnOn(minutes)
+                    addLog("${cfg.name}: הודלק מהווידג'ט" + if (minutes > 0) " ל-$minutes דק'" else "")
+                    updateStatus(id) {
+                        it.copy(
+                            on = true, noLimitThisRun = false, timeOnSec = 0, timeLeftSec = minutes * 60L,
+                            updatedAtMs = System.currentTimeMillis(),
+                        )
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            updateStatus(id) { it.copy(reachable = false, error = "לא מגיב ברשת") }
+        } finally {
+            updateStatus(id) { it.copy(busy = false) }
+        }
+        pollAndGuard(id)
+    }
+
     fun clearLog() {
         _log.value = emptyList(); saveLog()
     }
@@ -297,6 +338,9 @@ object Switchers {
         _devices.value = configs.value.values
             .sortedBy { it.name }
             .map { Device(it, s[it.id] ?: DeviceStatus()) }
+        if (::appContext.isInitialized) {
+            runCatching { com.switcherplus.app.widget.PowerWidget.onDevicesChanged(appContext, _devices.value) }
+        }
     }
 
     private fun addLog(line: String) {

@@ -4,4 +4,12 @@
     <string name="guard_channel">כיבוי אוטומטי</string>
     <string name="guard_notification_title">כיבוי אוטומטי פעיל</string>
     <string name="guard_notification_text">שומר שהמכשירים לא יישארו דלוקים יותר מהזמן שהגדרת</string>
+    <string name="widget_description">הדלקה וכיבוי בלחיצה אחת, עם הכיבוי האוטומטי שהגדרת</string>
+    <string name="widget_toggle">הדלקה או כיבוי</string>
+    <string name="widget_on">דלוק · %1$dW</string>
+    <string name="widget_off">כבוי · לחץ להדלקה</string>
+    <string name="widget_working">רגע…</string>
+    <string name="widget_tap">לחץ להדלקה</string>
+    <string name="widget_unreachable">לא זמין ברשת</string>
+    <string name="widget_no_device">פתח את האפליקציה</string>
 </resources>
