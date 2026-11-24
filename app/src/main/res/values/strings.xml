@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">סוויצ\'ר פלוס</string>
+    <string name="guard_channel">כיבוי אוטומטי</string>
+    <string name="guard_notification_title">כיבוי אוטומטי פעיל</string>
+    <string name="guard_notification_text">שומר שהמכשירים לא יישארו דלוקים יותר מהזמן שהגדרת</string>
+</resources>
